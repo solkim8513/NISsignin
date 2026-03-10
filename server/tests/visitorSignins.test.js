@@ -78,6 +78,23 @@ describe('Visitor sign-in routes', () => {
     expect(response.body.error).toContain('exactly 4 numbers');
   });
 
+  test('rejects time out that is not later than time in', async () => {
+    const response = await request(app).post('/api/visitor-signins/public').send({
+      full_name: 'Jane Visitor',
+      company: 'NIS',
+      appointment_with: 'Rebecca Bunch',
+      clearance_level: 'secret',
+      us_citizen: 'yes',
+      id_type: 'state id',
+      time_in: '1730',
+      time_out: '1730',
+      badge_number: '1234'
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('later than');
+  });
+
   test('rejects non-numeric badge number', async () => {
     const response = await request(app).post('/api/visitor-signins/public').send({
       full_name: 'Jane Visitor',

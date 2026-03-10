@@ -69,6 +69,9 @@ router.post('/public', async (req, res, next) => {
     if (time_out && !TIME_DIGITS_REGEX.test(time_out)) {
       return res.status(400).json({ error: 'Time out must be exactly 4 numbers (HHMM)' });
     }
+    if (time_out && time_in >= time_out) {
+      return res.status(400).json({ error: 'Time out must be later than time in' });
+    }
     if (!NUMERIC_REGEX.test(badge_number)) {
       return res.status(400).json({ error: 'Badge number must contain numbers only' });
     }

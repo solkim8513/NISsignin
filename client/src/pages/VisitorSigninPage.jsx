@@ -95,6 +95,10 @@ export default function VisitorSigninPage() {
       setError('Time Out must be exactly 4 numbers (HHMM), for example 1730.');
       return;
     }
+    if (normalizedForm.time_out && normalizedForm.time_in >= normalizedForm.time_out) {
+      setError('Time Out must be later than Time In.');
+      return;
+    }
     if (!NUMERIC_REGEX.test(normalizedForm.badge_number)) {
       setError('Badge number must contain numbers only.');
       return;

@@ -26,6 +26,8 @@ Digital visitor sign-in system for NIS reception.
 - In GitHub: `NISsignin` -> `Settings` -> `Pages` -> Source = `GitHub Actions`.
 - Optional: set repository variable `VITE_API_BASE_URL` to your public backend API URL.
 - Important: GitHub Pages hosts static frontend only. Your Node/Express/PostgreSQL backend must be deployed separately for form submission and email features to work.
+- Temporary override for testing: open `https://solkim8513.github.io/NISsignin/?apiBase=https://YOUR-API-DOMAIN`.
+  This stores the API base in browser local storage for that device.
 
 ## Share with colleagues on local network
 - Do not share `localhost` links. `localhost` always points to each person's own device.

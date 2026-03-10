@@ -1,3 +1,0 @@
-name,nis_email,federal_email,teams_id,pm_name,pm_email,skillsets,certifications,contract_title,position,clearance_level,availability_status,ok_to_contact_directly,notify_routing,preferred_contact,is_active
-Jane Doe,jane@company.com,,jane.teams,PM One,pm1@company.com,"cloud,aws","PMP,Security+",Platform,Engineer,Secret,available,true,both,email,true
-John Smith,john@company.com,,john.teams,PM Two,pm2@company.com,"network,zero trust","CISSP",Security,Architect,Top Secret,limited,true,sme_only,teams,true

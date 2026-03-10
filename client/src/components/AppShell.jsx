@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 function LinkItem({ to, children }) {
   return (
@@ -17,7 +17,6 @@ function LinkItem({ to, children }) {
 
 export default function AppShell() {
   const navigate = useNavigate();
-  const location = useLocation();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   function logout() {
@@ -26,26 +25,15 @@ export default function AppShell() {
     navigate('/login');
   }
 
-  const inSmeSection = location.pathname.startsWith('/smes');
-
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 md:flex">
       <aside className="w-full bg-[#0b1733] text-white md:min-h-screen md:w-64">
         <div className="border-b border-white/10 p-5">
-          <h1 className="text-2xl font-semibold tracking-tight">SME Finder</h1>
-          <p className="mt-1 text-xs text-slate-300">Proposal Team Tool</p>
+          <h1 className="text-2xl font-semibold tracking-tight">NIS Sign-In</h1>
+          <p className="mt-1 text-xs text-slate-300">Visitor Management</p>
         </div>
 
         <nav className="space-y-3 p-3">
-          <LinkItem to="/dashboard">Dashboard</LinkItem>
-          <div className={`rounded-lg p-2 ${inSmeSection ? 'bg-white/5' : ''}`}>
-            <p className="px-2 pb-2 text-xs uppercase tracking-widest text-slate-400">SME Directory</p>
-            <div className="space-y-1">
-              <LinkItem to="/smes">Directory</LinkItem>
-              <LinkItem to="/smes/import">Bulk Import</LinkItem>
-            </div>
-          </div>
-          <LinkItem to="/requests">Requests</LinkItem>
           <LinkItem to="/visitor-kiosk">Visitor Kiosk</LinkItem>
         </nav>
       </aside>

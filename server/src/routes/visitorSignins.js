@@ -2,6 +2,7 @@ const express = require('express');
 const QRCode = require('qrcode');
 const pool = require('../db/pool');
 const { requireAuth, requireRole } = require('../middleware/auth');
+const { sendVisitorSigninNotification } = require('../services/emailService');
 
 const router = express.Router();
 
@@ -31,7 +32,16 @@ router.post('/public', async (req, res, next) => {
       ]
     );
 
-    return res.status(201).json({ success: true, signin: result.rows[0] });
+    const signin = result.rows[0];
+    let emailNotification = { sent: false, skipped: true };
+    try {
+      emailNotification = await sendVisitorSigninNotification(signin);
+    } catch (notifyError) {
+      console.error('visitor sign-in email notification failed', notifyError);
+      emailNotification = { sent: false, skipped: false, error: true };
+    }
+
+    return res.status(201).json({ success: true, signin, email_notification: emailNotification });
   } catch (error) {
     return next(error);
   }

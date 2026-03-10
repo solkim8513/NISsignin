@@ -37,7 +37,7 @@ export default function VisitorSigninPage() {
         <img
           src={nisLogo}
           alt="NIS logo"
-          className="mb-4 h-24 w-auto max-w-full rounded border border-slate-200 p-2 object-contain"
+          className="mx-auto mb-4 w-full max-w-sm h-auto rounded border border-slate-200 p-2"
         />
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Visitor Sign-In</h1>
         <p className="mt-2 text-sm text-slate-600">Nationwide IT Services, Inc. - Please complete all fields.</p>

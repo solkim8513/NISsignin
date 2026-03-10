@@ -33,7 +33,7 @@ export default function AppShell() {
           <img
             src={nisLogo}
             alt="NIS logo"
-            className="h-20 w-auto max-w-full rounded bg-white p-2 object-contain"
+            className="w-full h-auto rounded bg-white p-2"
           />
           <p className="mt-2 text-xs text-slate-300">Visitor Management</p>
         </div>

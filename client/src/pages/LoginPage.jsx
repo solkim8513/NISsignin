@@ -27,7 +27,7 @@ export default function LoginPage() {
       <img
         src={nisLogo}
         alt="NIS logo"
-        className="mb-4 h-24 w-auto max-w-full rounded border border-slate-200 p-2 object-contain"
+        className="mx-auto mb-4 w-full max-w-sm h-auto rounded border border-slate-200 p-2"
       />
       <h1 className="text-xl font-semibold mb-4">Admin Sign In</h1>
       <input className="w-full border p-2 mb-3" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />

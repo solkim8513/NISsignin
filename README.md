@@ -20,6 +20,13 @@ Digital visitor sign-in system for NIS reception.
 - Public sign-in page: `http://localhost:5173/visitor-signin`
 - Internal kiosk page: `http://localhost:5173/visitor-kiosk`
 
+## GitHub Pages URL
+- After deployment, frontend URL is: `https://solkim8513.github.io/NISsignin/`
+- This repo includes `.github/workflows/deploy-pages.yml` to publish automatically on each push to `main`.
+- In GitHub: `NISsignin` -> `Settings` -> `Pages` -> Source = `GitHub Actions`.
+- Optional: set repository variable `VITE_API_BASE_URL` to your public backend API URL.
+- Important: GitHub Pages hosts static frontend only. Your Node/Express/PostgreSQL backend must be deployed separately for form submission and email features to work.
+
 ## Share with colleagues on local network
 - Do not share `localhost` links. `localhost` always points to each person's own device.
 - Share `http://<your-computer-ip>:5173/visitor-signin` instead.

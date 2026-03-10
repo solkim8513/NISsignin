@@ -27,7 +27,7 @@ Digital visitor sign-in system for NIS reception.
 
 ## Email alert setup (required for real sending)
 Set these in `server/.env` or Docker environment:
-- `NOTIFY_FROM_EMAIL` (default `signin@nw-its.com`)
+- `NOTIFY_FROM_EMAIL` (default `nissignin@nw0its`)
 - `VISITOR_ALERT_TO` (default `rebecca.bunch@nw-its.com`)
 - `SMTP_HOST`
 - `SMTP_PORT` (usually `587`)

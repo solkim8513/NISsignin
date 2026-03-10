@@ -19,7 +19,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/nis_signin
       JWT_SECRET: dev_jwt_secret
       CLIENT_BASE_URL: http://localhost:5173
-      NOTIFY_FROM_EMAIL: signin@nw-its.com
+      NOTIFY_FROM_EMAIL: nissignin@nw0its
       VISITOR_ALERT_TO: rebecca.bunch@nw-its.com
       SMTP_HOST: ""
       SMTP_PORT: 587

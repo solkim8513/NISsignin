@@ -41,7 +41,7 @@ function getTransporter() {
 }
 
 async function sendEmail({ to, subject, text }) {
-  const from = process.env.NOTIFY_FROM_EMAIL || 'signin@nw-its.com';
+  const from = process.env.NOTIFY_FROM_EMAIL || 'nissignin@nw0its';
   const transporter = getTransporter();
 
   if (!transporter) {

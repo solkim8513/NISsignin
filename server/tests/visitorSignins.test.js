@@ -35,7 +35,7 @@ describe('Visitor sign-in routes', () => {
           us_citizen: 'yes',
           id_type: 'state id',
           id_type_other: null,
-          time_in: '08:30',
+          time_in: '0830',
           time_out: '',
           badge_number: '1234',
           submitted_at: '2026-03-10T12:00:00.000Z'
@@ -50,7 +50,7 @@ describe('Visitor sign-in routes', () => {
       clearance_level: 'secret',
       us_citizen: 'yes',
       id_type: 'state id',
-      time_in: '08:30',
+      time_in: '0830',
       time_out: '',
       badge_number: '1234'
     });
@@ -70,12 +70,12 @@ describe('Visitor sign-in routes', () => {
       clearance_level: 'secret',
       us_citizen: 'yes',
       id_type: 'state id',
-      time_in: '8.30',
+      time_in: '10:30',
       badge_number: '1234'
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Time in');
+    expect(response.body.error).toContain('numbers only');
   });
 
   test('rejects non-numeric badge number', async () => {
@@ -86,7 +86,7 @@ describe('Visitor sign-in routes', () => {
       clearance_level: 'secret',
       us_citizen: 'yes',
       id_type: 'state id',
-      time_in: '08:30',
+      time_in: '0830',
       badge_number: '12A4'
     });
 
@@ -108,7 +108,7 @@ describe('Visitor sign-in routes', () => {
           clearance_level: 'secret',
           us_citizen: 'yes',
           id_type: 'state id',
-          time_in: '08:30',
+          time_in: '0830',
           time_out: '',
           badge_number: '1234',
           submitted_at: '2026-03-10T12:00:00.000Z'

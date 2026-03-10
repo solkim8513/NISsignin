@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { apiPost } from '../lib/api';
 import nisLogo from '../assets/nis-logo-original.png';
 
-const TIME_REGEX = /^([01]?\d|2[0-3]):[0-5]\d$/;
+const TIME_DIGITS_REGEX = /^\d{3,4}$/;
 const NUMERIC_REGEX = /^\d+$/;
 const CLEARANCE_OPTIONS = ['none', 'public trust', 'confidential', 'secret', 'top secret', 'ts/sci', 'other'];
 const ID_TYPE_OPTIONS = ['state id', 'dl', 'other'];
@@ -87,12 +87,12 @@ export default function VisitorSigninPage() {
       setError('Please enter a value for Type of ID (Other).');
       return;
     }
-    if (!TIME_REGEX.test(normalizedForm.time_in)) {
-      setError('Time In must be in HH:MM 24-hour format.');
+    if (!TIME_DIGITS_REGEX.test(normalizedForm.time_in)) {
+      setError('Time In must contain numbers only (HHMM).');
       return;
     }
-    if (normalizedForm.time_out && !TIME_REGEX.test(normalizedForm.time_out)) {
-      setError('Time Out must be in HH:MM 24-hour format.');
+    if (normalizedForm.time_out && !TIME_DIGITS_REGEX.test(normalizedForm.time_out)) {
+      setError('Time Out must contain numbers only (HHMM).');
       return;
     }
     if (!NUMERIC_REGEX.test(normalizedForm.badge_number)) {
@@ -199,13 +199,16 @@ export default function VisitorSigninPage() {
                 <option value="no">No</option>
               </select>
               {form.clearance_level === 'other' && (
-                <input
-                  className="w-full rounded-md border border-slate-300 p-3 text-base md:col-span-2"
-                  placeholder="Other clearance level"
-                  value={form.clearance_level_other}
-                  onChange={(e) => setForm({ ...form, clearance_level_other: e.target.value })}
-                  required
-                />
+                <label className="w-full text-sm text-slate-600 md:col-span-2">
+                  Clearance Level - Other
+                  <input
+                    className="mt-1 w-full rounded-md border border-slate-300 p-3 text-base"
+                    placeholder="Enter clearance level"
+                    value={form.clearance_level_other}
+                    onChange={(e) => setForm({ ...form, clearance_level_other: e.target.value })}
+                    required
+                  />
+                </label>
               )}
               <select
                 className="w-full rounded-md border border-slate-300 p-3 text-base"
@@ -223,30 +226,33 @@ export default function VisitorSigninPage() {
               <input
                 className="w-full rounded-md border border-slate-300 p-3 text-base"
                 inputMode="numeric"
-                pattern="[0-9:]*"
-                maxLength={5}
-                placeholder="Time In (HH:MM)"
+                pattern="[0-9]*"
+                maxLength={4}
+                placeholder="Time In (HHMM)"
                 value={form.time_in}
-                onChange={(e) => setForm({ ...form, time_in: e.target.value.replace(/[^0-9:]/g, '') })}
+                onChange={(e) => setForm({ ...form, time_in: e.target.value.replace(/\D/g, '') })}
                 required
               />
               {form.id_type === 'other' && (
-                <input
-                  className="w-full rounded-md border border-slate-300 p-3 text-base md:col-span-2"
-                  placeholder="Other ID type"
-                  value={form.id_type_other}
-                  onChange={(e) => setForm({ ...form, id_type_other: e.target.value })}
-                  required
-                />
+                <label className="w-full text-sm text-slate-600 md:col-span-2">
+                  Type of ID - Other
+                  <input
+                    className="mt-1 w-full rounded-md border border-slate-300 p-3 text-base"
+                    placeholder="Enter ID type"
+                    value={form.id_type_other}
+                    onChange={(e) => setForm({ ...form, id_type_other: e.target.value })}
+                    required
+                  />
+                </label>
               )}
               <input
                 className="w-full rounded-md border border-slate-300 p-3 text-base"
                 inputMode="numeric"
-                pattern="[0-9:]*"
-                maxLength={5}
-                placeholder="Time Out (HH:MM)"
+                pattern="[0-9]*"
+                maxLength={4}
+                placeholder="Time Out (HHMM)"
                 value={form.time_out}
-                onChange={(e) => setForm({ ...form, time_out: e.target.value.replace(/[^0-9:]/g, '') })}
+                onChange={(e) => setForm({ ...form, time_out: e.target.value.replace(/\D/g, '') })}
               />
               <input
                 className="w-full rounded-md border border-slate-300 p-3 text-base"

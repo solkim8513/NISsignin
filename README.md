@@ -4,10 +4,11 @@ Digital visitor sign-in system for NIS reception.
 
 ## What it does
 - Public mobile-friendly sign-in form (iPad kiosk + QR scan on personal phones)
-- Captures: full name, company, email, phone, purpose of visit
+- Captures: date (auto-today), full name, company, appointment with, clearance level, US citizen, ID type, time in/out, badge number
 - Internal kiosk page to view daily sign-ins
 - Admin can clear a selected day to keep a clean daily sheet
 - Email alert on each sign-in (default recipient: `rebecca.bunch@nw-its.com`)
+- Proposal/Admin can email daily visitor PDF report to Rebecca from the kiosk page
 
 ## Quick start
 1. `docker compose up --build`
@@ -32,7 +33,7 @@ Digital visitor sign-in system for NIS reception.
 - Containerized with Docker Compose
 
 ## Email alert setup (required for real sending)
-Set these in `server/.env` or Docker environment:
+Set these in a root `.env` file next to `docker-compose.yml` or export them in your shell:
 - `NOTIFY_FROM_EMAIL` (default `nissignin@nw-its.com`)
 - `VISITOR_ALERT_TO` (default `rebecca.bunch@nw-its.com`)
 - `SMTP_HOST`
@@ -41,4 +42,4 @@ Set these in `server/.env` or Docker environment:
 - `SMTP_USER`
 - `SMTP_PASS`
 
-If SMTP is not configured, sign-in still succeeds and email is skipped safely.
+If SMTP is not configured, sign-in still succeeds and email is skipped safely with reason `SMTP is not configured`.

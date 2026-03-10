@@ -2,15 +2,33 @@ import { useState } from 'react';
 import { apiPost } from '../lib/api';
 import nisLogo from '../assets/nis-logo-original.png';
 
-const initialForm = {
-  full_name: '',
-  company: '',
-  email: '',
-  phone: '',
-  purpose_of_visit: ''
-};
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const PHONE_DIGITS_REGEX = /^\d+$/;
+const TIME_REGEX = /^([01]?\d|2[0-3]):[0-5]\d$/;
+const NUMERIC_REGEX = /^\d+$/;
+const CLEARANCE_OPTIONS = ['none', 'public trust', 'confidential', 'secret', 'top secret', 'ts/sci', 'other'];
+const ID_TYPE_OPTIONS = ['state id', 'dl', 'other'];
+
+function todayDate() {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
+}
+
+function createInitialForm() {
+  return {
+    visit_date: todayDate(),
+    full_name: '',
+    company: '',
+    appointment_with: '',
+    clearance_level: '',
+    clearance_level_other: '',
+    us_citizen: '',
+    id_type: '',
+    id_type_other: '',
+    time_in: '',
+    time_out: '',
+    badge_number: ''
+  };
+}
 
 function getApiErrorMessage(error) {
   const fallback = 'Unable to submit right now. Please try again.';
@@ -25,7 +43,7 @@ function getApiErrorMessage(error) {
 }
 
 export default function VisitorSigninPage() {
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(createInitialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -34,19 +52,51 @@ export default function VisitorSigninPage() {
     event.preventDefault();
     const normalizedForm = {
       ...form,
+      visit_date: form.visit_date || todayDate(),
       full_name: form.full_name.trim(),
       company: form.company.trim(),
-      email: form.email.trim().toLowerCase(),
-      phone: form.phone.trim(),
-      purpose_of_visit: form.purpose_of_visit.trim()
+      appointment_with: form.appointment_with.trim(),
+      clearance_level: form.clearance_level.trim().toLowerCase(),
+      clearance_level_other: form.clearance_level_other.trim(),
+      us_citizen: form.us_citizen.trim().toLowerCase(),
+      id_type: form.id_type.trim().toLowerCase(),
+      id_type_other: form.id_type_other.trim(),
+      time_in: form.time_in.trim(),
+      time_out: form.time_out.trim(),
+      badge_number: form.badge_number.trim()
     };
 
-    if (!EMAIL_REGEX.test(normalizedForm.email)) {
-      setError('Please enter a valid email address.');
+    if (
+      !normalizedForm.full_name ||
+      !normalizedForm.company ||
+      !normalizedForm.appointment_with ||
+      !normalizedForm.clearance_level ||
+      !normalizedForm.us_citizen ||
+      !normalizedForm.id_type ||
+      !normalizedForm.time_in ||
+      !normalizedForm.badge_number
+    ) {
+      setError('Please complete all required fields.');
       return;
     }
-    if (!PHONE_DIGITS_REGEX.test(normalizedForm.phone)) {
-      setError('Phone number must contain numbers only.');
+    if (normalizedForm.clearance_level === 'other' && !normalizedForm.clearance_level_other) {
+      setError('Please enter a value for Clearance Level (Other).');
+      return;
+    }
+    if (normalizedForm.id_type === 'other' && !normalizedForm.id_type_other) {
+      setError('Please enter a value for Type of ID (Other).');
+      return;
+    }
+    if (!TIME_REGEX.test(normalizedForm.time_in)) {
+      setError('Time In must be in HH:MM 24-hour format.');
+      return;
+    }
+    if (normalizedForm.time_out && !TIME_REGEX.test(normalizedForm.time_out)) {
+      setError('Time Out must be in HH:MM 24-hour format.');
+      return;
+    }
+    if (!NUMERIC_REGEX.test(normalizedForm.badge_number)) {
+      setError('Badge number must contain numbers only.');
       return;
     }
 
@@ -55,7 +105,7 @@ export default function VisitorSigninPage() {
     try {
       await apiPost('/api/visitor-signins/public', normalizedForm);
       setSubmitted(true);
-      setForm(initialForm);
+      setForm(createInitialForm());
     } catch (submitError) {
       setError(getApiErrorMessage(submitError));
     } finally {
@@ -66,7 +116,7 @@ export default function VisitorSigninPage() {
   function returnToForm() {
     setSubmitted(false);
     setError('');
-    setForm(initialForm);
+    setForm(createInitialForm());
   }
 
   return (
@@ -95,7 +145,15 @@ export default function VisitorSigninPage() {
               </div>
             )}
 
-            <form className="mt-5 space-y-3" onSubmit={submit}>
+            <form className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2" onSubmit={submit}>
+              <input
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                type="date"
+                value={form.visit_date}
+                readOnly
+                title="Date is auto-filled to today."
+                required
+              />
               <input
                 className="w-full rounded-md border border-slate-300 p-3 text-base"
                 placeholder="Full name"
@@ -112,34 +170,98 @@ export default function VisitorSigninPage() {
               />
               <input
                 className="w-full rounded-md border border-slate-300 p-3 text-base"
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                placeholder="Appointment with"
+                value={form.appointment_with}
+                onChange={(e) => setForm({ ...form, appointment_with: e.target.value })}
                 required
+              />
+              <select
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                value={form.clearance_level}
+                onChange={(e) => setForm({ ...form, clearance_level: e.target.value, clearance_level_other: '' })}
+                required
+              >
+                <option value="">Clearance level</option>
+                {CLEARANCE_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                value={form.us_citizen}
+                onChange={(e) => setForm({ ...form, us_citizen: e.target.value })}
+                required
+              >
+                <option value="">US Citizen</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+              {form.clearance_level === 'other' && (
+                <input
+                  className="w-full rounded-md border border-slate-300 p-3 text-base md:col-span-2"
+                  placeholder="Other clearance level"
+                  value={form.clearance_level_other}
+                  onChange={(e) => setForm({ ...form, clearance_level_other: e.target.value })}
+                  required
+                />
+              )}
+              <select
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                value={form.id_type}
+                onChange={(e) => setForm({ ...form, id_type: e.target.value, id_type_other: '' })}
+                required
+              >
+                <option value="">Type of ID</option>
+                {ID_TYPE_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                inputMode="numeric"
+                pattern="[0-9:]*"
+                maxLength={5}
+                placeholder="Time In (HH:MM)"
+                value={form.time_in}
+                onChange={(e) => setForm({ ...form, time_in: e.target.value.replace(/[^0-9:]/g, '') })}
+                required
+              />
+              {form.id_type === 'other' && (
+                <input
+                  className="w-full rounded-md border border-slate-300 p-3 text-base md:col-span-2"
+                  placeholder="Other ID type"
+                  value={form.id_type_other}
+                  onChange={(e) => setForm({ ...form, id_type_other: e.target.value })}
+                  required
+                />
+              )}
+              <input
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                inputMode="numeric"
+                pattern="[0-9:]*"
+                maxLength={5}
+                placeholder="Time Out (HH:MM)"
+                value={form.time_out}
+                onChange={(e) => setForm({ ...form, time_out: e.target.value.replace(/[^0-9:]/g, '') })}
               />
               <input
                 className="w-full rounded-md border border-slate-300 p-3 text-base"
-                type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                placeholder="Phone number"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
-                required
-              />
-              <textarea
-                className="w-full rounded-md border border-slate-300 p-3 text-base"
-                placeholder="Purpose of visit"
-                value={form.purpose_of_visit}
-                onChange={(e) => setForm({ ...form, purpose_of_visit: e.target.value })}
+                placeholder="Badge #"
+                value={form.badge_number}
+                onChange={(e) => setForm({ ...form, badge_number: e.target.value.replace(/\D/g, '') })}
                 required
               />
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full rounded-md bg-blue-600 px-4 py-3 text-base font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+                className="w-full rounded-md bg-blue-600 px-4 py-3 text-base font-medium text-white hover:bg-blue-700 disabled:opacity-60 md:col-span-2"
               >
                 {isSubmitting ? 'Submitting...' : 'Sign In'}
               </button>

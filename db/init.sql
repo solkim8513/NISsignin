@@ -18,12 +18,21 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS visitor_signins (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  visit_date DATE NOT NULL DEFAULT CURRENT_DATE,
   full_name TEXT NOT NULL,
   company TEXT NOT NULL,
-  email TEXT NOT NULL,
-  phone TEXT NOT NULL,
-  purpose_of_visit TEXT NOT NULL,
-  visit_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  appointment_with TEXT NOT NULL DEFAULT '',
+  clearance_level TEXT NOT NULL DEFAULT '',
+  clearance_level_other TEXT,
+  us_citizen TEXT NOT NULL DEFAULT '',
+  id_type TEXT NOT NULL DEFAULT '',
+  id_type_other TEXT,
+  time_in TEXT NOT NULL DEFAULT '',
+  time_out TEXT NOT NULL DEFAULT '',
+  badge_number TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL DEFAULT '',
+  phone TEXT NOT NULL DEFAULT '',
+  purpose_of_visit TEXT NOT NULL DEFAULT '',
   submitted_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

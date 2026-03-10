@@ -11,13 +11,13 @@ function Protected({ children }) {
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<VisitorSigninPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/visitor-signin" element={<VisitorSigninPage />} />
-      <Route path="/" element={<Protected><AppShell /></Protected>}>
-        <Route index element={<Navigate to="/visitor-kiosk" replace />} />
-        <Route path="/visitor-kiosk" element={<VisitorKioskPage />} />
+      <Route path="/visitor-kiosk" element={<Protected><AppShell /></Protected>}>
+        <Route index element={<VisitorKioskPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/visitor-kiosk" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

@@ -25,6 +25,7 @@ Digital visitor sign-in system for NIS reception.
 - Share `http://<your-computer-ip>:5173/visitor-signin` instead.
 - Example on this machine: `http://30.30.30.57:5173/visitor-signin`
 - Your colleague must be on the same network/VPN and Windows Firewall must allow inbound access to port `5173`.
+- Optional: set `VITE_PUBLIC_BASE_URL` (in root `.env`) to force kiosk QR/link generation to a shareable URL.
 
 ## Tech stack
 - Frontend: React + Vite + Tailwind (`/client`)
@@ -44,9 +45,12 @@ Create `server/.env` (based on `server/.env.example`) and set:
 - `SMTP_SECURE` (`true` for SMTPS, usually `false` on 587)
 - `SMTP_USER`
 - `SMTP_PASS`
+- `SMTP_AUTH_USER` (optional; use when auth mailbox differs from sender identity)
+- `SMTP_AUTH_PASS` (optional; use when auth mailbox differs from sender identity)
 
 If SMTP is not configured, sign-in still succeeds and email is skipped safely with reason `SMTP is not configured`.
 For Microsoft 365, `SMTP_USER` must be a real mailbox account, not a distribution list.
+If you get `535 5.7.3 Authentication unsuccessful`, the app credentials are rejected by M365. IT must provide valid mailbox credentials and enable SMTP AUTH for that mailbox.
 
 ## Daily auto report schedule
 - `DAILY_REPORT_ENABLED` (`true` or `false`)

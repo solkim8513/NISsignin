@@ -18,6 +18,19 @@ services:
       PORT: 3001
       DATABASE_URL: postgresql://postgres:postgres@db:5432/nis_signin
       JWT_SECRET: dev_jwt_secret
+      CLIENT_BASE_URL: ${CLIENT_BASE_URL:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_AUTH_USER: ${SMTP_AUTH_USER:-}
+      SMTP_AUTH_PASS: ${SMTP_AUTH_PASS:-}
+      NOTIFY_FROM_EMAIL: ${NOTIFY_FROM_EMAIL:-}
+      NOTIFY_REPLY_TO: ${NOTIFY_REPLY_TO:-}
+      VISITOR_ALERT_TO: ${VISITOR_ALERT_TO:-}
+      USE_NOTIFY_FROM_EMAIL_AS_SENDER: ${USE_NOTIFY_FROM_EMAIL_AS_SENDER:-false}
+      FALLBACK_TO_SMTP_USER_ON_SEND_AS_DENIED: ${FALLBACK_TO_SMTP_USER_ON_SEND_AS_DENIED:-true}
       DAILY_REPORT_ENABLED: ${DAILY_REPORT_ENABLED:-true}
       DAILY_REPORT_TIME: ${DAILY_REPORT_TIME:-17:00}
       REPORT_TIMEZONE: ${REPORT_TIMEZONE:-America/New_York}
@@ -36,6 +49,7 @@ services:
     environment:
       VITE_API_BASE_URL: ""
       VITE_PROXY_TARGET: http://server:3001
+      VITE_PUBLIC_BASE_URL: ${VITE_PUBLIC_BASE_URL:-}
     ports:
       - "5173:5173"
     depends_on:

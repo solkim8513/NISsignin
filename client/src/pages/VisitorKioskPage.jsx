@@ -5,6 +5,16 @@ function todayDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function getApiErrorMessage(error, fallback) {
+  if (!error?.message) return fallback;
+  try {
+    const parsed = JSON.parse(error.message);
+    return parsed?.error || fallback;
+  } catch {
+    return error.message || fallback;
+  }
+}
+
 export default function VisitorKioskPage() {
   const [date, setDate] = useState(todayDate());
   const [records, setRecords] = useState([]);
@@ -12,6 +22,7 @@ export default function VisitorKioskPage() {
   const [qrImage, setQrImage] = useState('');
   const [publicUrl, setPublicUrl] = useState('');
   const [message, setMessage] = useState('');
+  const [messageTone, setMessageTone] = useState('info');
 
   const role = useMemo(() => {
     try {
@@ -28,49 +39,64 @@ export default function VisitorKioskPage() {
   }
 
   async function loadQr() {
-    const url = `${window.location.origin}/visitor-signin`;
+    const configuredPublicBaseUrl = (import.meta.env.VITE_PUBLIC_BASE_URL || '').trim().replace(/\/$/, '');
+    const baseUrl = configuredPublicBaseUrl || window.location.origin;
+    const url = `${baseUrl}/visitor-signin`;
     const qr = await apiGet(`/api/visitor-signins/qr?url=${encodeURIComponent(url)}`);
     setPublicUrl(qr.url);
     setQrImage(qr.image_data_url);
   }
 
   useEffect(() => {
-    Promise.all([loadRecords(), loadQr()]).catch(() => setMessage('Unable to load kiosk data right now.'));
+    Promise.all([loadRecords(), loadQr()]).catch(() => {
+      setMessageTone('error');
+      setMessage('Unable to load kiosk data right now.');
+    });
   }, []);
 
   async function refresh() {
     setMessage('');
+    setMessageTone('info');
     try {
       await loadRecords();
       await loadQr();
+      setMessageTone('success');
       setMessage('Kiosk data refreshed.');
     } catch {
+      setMessageTone('error');
       setMessage('Refresh failed.');
     }
   }
 
   async function clearSelectedDate() {
     setMessage('');
+    setMessageTone('info');
     try {
       const result = await apiDelete(`/api/visitor-signins/by-date?date=${date}`);
       await loadRecords(date);
+      setMessageTone('success');
       setMessage(`Deleted ${result.deleted} records for ${date}.`);
     } catch {
+      setMessageTone('error');
       setMessage('Unable to clear selected date.');
     }
   }
 
   async function sendDailyReport() {
     setMessage('');
+    setMessageTone('info');
     try {
       const result = await apiPost('/api/visitor-signins/report/daily', { date });
       if (result.report?.sent) {
+        setMessageTone('success');
         setMessage(`Daily PDF report for ${date} sent to Rebecca.`);
       } else {
+        setMessageTone('error');
         setMessage(`Report generation completed, but email was skipped: ${result.report?.reason || 'check SMTP settings'}.`);
       }
     } catch (sendError) {
-      setMessage('Unable to send daily report email.');
+      setMessageTone('error');
+      setMessage(getApiErrorMessage(sendError, 'Unable to send daily report email.'));
     }
   }
 
@@ -87,6 +113,12 @@ export default function VisitorKioskPage() {
         <section className="rounded-xl border border-slate-200 bg-white p-4">
           <h2 className="text-lg font-semibold">Public Sign-In Link</h2>
           <p className="mt-2 rounded-md border border-slate-200 bg-slate-50 p-2 text-sm break-all">{publicUrl}</p>
+          {publicUrl && /(localhost|127\.0\.0\.1)/i.test(publicUrl) && (
+            <p className="mt-2 text-xs text-amber-700">
+              This link is localhost-only. Set VITE_PUBLIC_BASE_URL to a shareable host (for example
+              {' '}http://YOUR-IP:5173) before sharing.
+            </p>
+          )}
           <a
             className="mt-2 inline-block text-sm text-blue-600 hover:underline"
             href={publicUrl}
@@ -126,7 +158,11 @@ export default function VisitorKioskPage() {
             )}
           </div>
           <p className="mt-3 text-sm text-slate-600">Total sign-ins for {date}: <span className="font-semibold">{total}</span></p>
-          {message && <p className="mt-2 text-sm text-emerald-700">{message}</p>}
+          {message && (
+            <p className={`mt-2 text-sm ${messageTone === 'error' ? 'text-red-700' : 'text-emerald-700'}`}>
+              {message}
+            </p>
+          )}
         </section>
       </div>
 

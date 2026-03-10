@@ -9,12 +9,19 @@ function parseBool(value, fallback = false) {
 }
 
 function getSmtpConfig() {
+  const smtpUser = normalizeEmail(process.env.SMTP_USER);
+  const smtpPass = process.env.SMTP_PASS;
+  const smtpAuthUser = normalizeEmail(process.env.SMTP_AUTH_USER) || smtpUser;
+  const smtpAuthPass = process.env.SMTP_AUTH_PASS || smtpPass;
+
   return {
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT || 587),
     secure: parseBool(process.env.SMTP_SECURE, false),
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+    user: smtpUser,
+    pass: smtpPass,
+    authUser: smtpAuthUser,
+    authPass: smtpAuthPass
   };
 }
 
@@ -32,7 +39,21 @@ function shouldFallbackToSmtpUser(error) {
 }
 
 function isSmtpConfigured(config) {
-  return Boolean(config.host && config.user && config.pass);
+  return Boolean(config.host && config.authUser && config.authPass);
+}
+
+function classifyEmailError(error) {
+  if (!error) return 'Email delivery failed.';
+  if (error.code === 'EAUTH') {
+    return 'SMTP authentication failed. Verify SMTP_AUTH_USER/SMTP_AUTH_PASS (or SMTP_USER/SMTP_PASS) and ensure SMTP AUTH is enabled.';
+  }
+  if (error.code === 'EDNS' || error.code === 'ENOTFOUND') {
+    return 'SMTP host lookup failed. Verify SMTP_HOST and network DNS access.';
+  }
+  if (error.code === 'ECONNECTION' || error.code === 'ETIMEDOUT') {
+    return 'SMTP connection failed. Verify SMTP_PORT and outbound firewall access.';
+  }
+  return error.message || 'Email delivery failed.';
 }
 
 function getTransporter() {
@@ -46,8 +67,8 @@ function getTransporter() {
     port: config.port,
     secure: config.secure,
     auth: {
-      user: config.user,
-      pass: config.pass
+      user: config.authUser,
+      pass: config.authPass
     }
   });
 
@@ -197,4 +218,4 @@ async function sendDailyVisitorReport({ date, records }) {
   });
 }
 
-module.exports = { sendEmail, sendVisitorSigninNotification, sendDailyVisitorReport };
+module.exports = { sendEmail, sendVisitorSigninNotification, sendDailyVisitorReport, classifyEmailError };

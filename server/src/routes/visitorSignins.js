@@ -2,7 +2,7 @@ const express = require('express');
 const QRCode = require('qrcode');
 const pool = require('../db/pool');
 const { requireAuth, requireRole } = require('../middleware/auth');
-const { sendVisitorSigninNotification, sendDailyVisitorReport } = require('../services/emailService');
+const { sendVisitorSigninNotification, sendDailyVisitorReport, classifyEmailError } = require('../services/emailService');
 
 const router = express.Router();
 const TIME_DIGITS_REGEX = /^\d{4}$/;
@@ -115,7 +115,13 @@ router.post('/public', async (req, res, next) => {
       emailNotification = await sendVisitorSigninNotification(signin);
     } catch (notifyError) {
       console.error('visitor sign-in email notification failed', notifyError);
-      emailNotification = { sent: false, skipped: false, error: true };
+      emailNotification = {
+        sent: false,
+        skipped: false,
+        error: true,
+        reason: classifyEmailError(notifyError),
+        code: notifyError?.code || 'EMAIL_SEND_FAILED'
+      };
     }
 
     return res.status(201).json({ success: true, signin, email_notification: emailNotification });
@@ -135,7 +141,15 @@ router.post('/report/daily', requireAuth, requireRole('proposal_manager', 'admin
       [date]
     );
 
-    const reportResult = await sendDailyVisitorReport({ date, records: result.rows });
+    let reportResult;
+    try {
+      reportResult = await sendDailyVisitorReport({ date, records: result.rows });
+    } catch (emailError) {
+      return res.status(502).json({
+        error: classifyEmailError(emailError),
+        code: emailError?.code || 'EMAIL_SEND_FAILED'
+      });
+    }
     return res.json({ success: true, date, count: result.rowCount, report: reportResult });
   } catch (error) {
     return next(error);

@@ -34,7 +34,10 @@ Digital visitor sign-in system for NIS reception.
 
 ## Email alert setup (required for real sending)
 Create `server/.env` (based on `server/.env.example`) and set:
-- `NOTIFY_FROM_EMAIL` (default `nissignin@nw-its.com`)
+- `NOTIFY_FROM_EMAIL` (default `nissignin@nw-its.com`, can be a distribution list)
+- `NOTIFY_REPLY_TO` (optional; default can point to the same DL)
+- `USE_NOTIFY_FROM_EMAIL_AS_SENDER` (default `false`; keep `false` if `NOTIFY_FROM_EMAIL` is a DL without Send As permission)
+- `FALLBACK_TO_SMTP_USER_ON_SEND_AS_DENIED` (default `true`)
 - `VISITOR_ALERT_TO` (default `rebecca.bunch@nw-its.com`)
 - `SMTP_HOST`
 - `SMTP_PORT` (usually `587`)
@@ -43,6 +46,7 @@ Create `server/.env` (based on `server/.env.example`) and set:
 - `SMTP_PASS`
 
 If SMTP is not configured, sign-in still succeeds and email is skipped safely with reason `SMTP is not configured`.
+For Microsoft 365, `SMTP_USER` must be a real mailbox account, not a distribution list.
 
 ## Daily auto report schedule
 - `DAILY_REPORT_ENABLED` (`true` or `false`)

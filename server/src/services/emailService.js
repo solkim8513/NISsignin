@@ -18,6 +18,19 @@ function getSmtpConfig() {
   };
 }
 
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function shouldFallbackToSmtpUser(error) {
+  const text = `${error?.message || ''} ${error?.response || ''}`.toLowerCase();
+  return (
+    text.includes('5.7.60') ||
+    text.includes('sendasdenied') ||
+    text.includes('not authorized to send as')
+  );
+}
+
 function isSmtpConfigured(config) {
   return Boolean(config.host && config.user && config.pass);
 }
@@ -88,7 +101,18 @@ function buildDailyReportPdf({ date, records }) {
 }
 
 async function sendEmail({ to, subject, text, html, attachments }) {
-  const from = process.env.NOTIFY_FROM_EMAIL || 'nissignin@nw-its.com';
+  const config = getSmtpConfig();
+  const smtpUser = normalizeEmail(config.user);
+  const notifyFrom = normalizeEmail(process.env.NOTIFY_FROM_EMAIL);
+  const notifyReplyTo = normalizeEmail(process.env.NOTIFY_REPLY_TO);
+  const useNotifyFromAsSender = parseBool(process.env.USE_NOTIFY_FROM_EMAIL_AS_SENDER, false);
+  const fallbackToSmtpUser = parseBool(process.env.FALLBACK_TO_SMTP_USER_ON_SEND_AS_DENIED, true);
+
+  const from = useNotifyFromAsSender && notifyFrom
+    ? notifyFrom
+    : (smtpUser || notifyFrom || 'nissignin@nw-its.com');
+  const replyTo = notifyReplyTo || (notifyFrom && notifyFrom !== from ? notifyFrom : undefined);
+
   const transporter = getTransporter();
 
   if (!transporter) {
@@ -96,14 +120,37 @@ async function sendEmail({ to, subject, text, html, attachments }) {
     return { sent: false, skipped: true, reason: 'SMTP is not configured' };
   }
 
-  await transporter.sendMail({
-    from,
-    to,
-    subject,
-    text,
-    html,
-    attachments
-  });
+  try {
+    await transporter.sendMail({
+      from,
+      to,
+      subject,
+      text,
+      html,
+      attachments,
+      replyTo
+    });
+  } catch (error) {
+    const canFallback = (
+      fallbackToSmtpUser &&
+      smtpUser &&
+      from !== smtpUser &&
+      shouldFallbackToSmtpUser(error)
+    );
+
+    if (!canFallback) throw error;
+
+    console.warn('Send-as denied. Retrying with SMTP_USER as sender and NOTIFY_FROM_EMAIL as reply-to.');
+    await transporter.sendMail({
+      from: smtpUser,
+      to,
+      subject,
+      text,
+      html,
+      attachments,
+      replyTo: notifyFrom || replyTo
+    });
+  }
 
   return { sent: true, skipped: false };
 }

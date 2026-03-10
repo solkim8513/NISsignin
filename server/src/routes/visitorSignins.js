@@ -5,7 +5,7 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 const { sendVisitorSigninNotification, sendDailyVisitorReport } = require('../services/emailService');
 
 const router = express.Router();
-const TIME_DIGITS_REGEX = /^\d{3,4}$/;
+const TIME_DIGITS_REGEX = /^\d{4}$/;
 const NUMERIC_REGEX = /^\d+$/;
 const CLEARANCE_OPTIONS = new Set([
   'none',
@@ -64,10 +64,10 @@ router.post('/public', async (req, res, next) => {
       return res.status(400).json({ error: 'Please enter an ID type for Other' });
     }
     if (!TIME_DIGITS_REGEX.test(time_in)) {
-      return res.status(400).json({ error: 'Time in must contain numbers only (HHMM)' });
+      return res.status(400).json({ error: 'Time in must be exactly 4 numbers (HHMM)' });
     }
     if (time_out && !TIME_DIGITS_REGEX.test(time_out)) {
-      return res.status(400).json({ error: 'Time out must contain numbers only (HHMM)' });
+      return res.status(400).json({ error: 'Time out must be exactly 4 numbers (HHMM)' });
     }
     if (!NUMERIC_REGEX.test(badge_number)) {
       return res.status(400).json({ error: 'Badge number must contain numbers only' });

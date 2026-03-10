@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { apiPost } from '../lib/api';
 import nisLogo from '../assets/nis-logo-original.png';
 
-const TIME_DIGITS_REGEX = /^\d{3,4}$/;
+const TIME_DIGITS_REGEX = /^\d{4}$/;
 const NUMERIC_REGEX = /^\d+$/;
 const CLEARANCE_OPTIONS = ['none', 'public trust', 'confidential', 'secret', 'top secret', 'ts/sci', 'other'];
 const ID_TYPE_OPTIONS = ['state id', 'dl', 'other'];
@@ -88,11 +88,11 @@ export default function VisitorSigninPage() {
       return;
     }
     if (!TIME_DIGITS_REGEX.test(normalizedForm.time_in)) {
-      setError('Time In must contain numbers only (HHMM).');
+      setError('Time In must be exactly 4 numbers (HHMM), for example 0930.');
       return;
     }
     if (normalizedForm.time_out && !TIME_DIGITS_REGEX.test(normalizedForm.time_out)) {
-      setError('Time Out must contain numbers only (HHMM).');
+      setError('Time Out must be exactly 4 numbers (HHMM), for example 1730.');
       return;
     }
     if (!NUMERIC_REGEX.test(normalizedForm.badge_number)) {

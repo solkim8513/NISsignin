@@ -75,7 +75,7 @@ describe('Visitor sign-in routes', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('numbers only');
+    expect(response.body.error).toContain('exactly 4 numbers');
   });
 
   test('rejects non-numeric badge number', async () => {

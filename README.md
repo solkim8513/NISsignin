@@ -19,6 +19,12 @@ Digital visitor sign-in system for NIS reception.
 - Public sign-in page: `http://localhost:5173/visitor-signin`
 - Internal kiosk page: `http://localhost:5173/visitor-kiosk`
 
+## Share with colleagues on local network
+- Do not share `localhost` links. `localhost` always points to each person's own device.
+- Share `http://<your-computer-ip>:5173/visitor-signin` instead.
+- Example on this machine: `http://30.30.30.57:5173/visitor-signin`
+- Your colleague must be on the same network/VPN and Windows Firewall must allow inbound access to port `5173`.
+
 ## Tech stack
 - Frontend: React + Vite + Tailwind (`/client`)
 - Backend: Node.js + Express (`/server`)

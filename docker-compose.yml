@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: sme_finder
+      POSTGRES_DB: nis_signin
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -16,10 +16,10 @@ services:
       context: ./server
     environment:
       PORT: 3001
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/sme_finder
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/nis_signin
       JWT_SECRET: dev_jwt_secret
       CLIENT_BASE_URL: http://localhost:5173
-      NOTIFY_FROM_EMAIL: smefinder@nw-its.com
+      NOTIFY_FROM_EMAIL: signin@nw-its.com
       VISITOR_ALERT_TO: rebecca.bunch@nw-its.com
       SMTP_HOST: ""
       SMTP_PORT: 587

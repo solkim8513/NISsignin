@@ -31,5 +31,5 @@ CREATE INDEX IF NOT EXISTS idx_visitor_signins_visit_date
   ON visitor_signins(visit_date, submitted_at DESC);
 
 INSERT INTO users (email, password_hash, first_name, last_name, role)
-SELECT 'admin@smefinder.local', crypt('admin123', gen_salt('bf')), 'System', 'Admin', 'admin'::user_role
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@smefinder.local');
+SELECT 'admin@nis.local', crypt('admin123', gen_salt('bf')), 'System', 'Admin', 'admin'::user_role
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@nis.local');

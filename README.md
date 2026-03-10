@@ -13,7 +13,7 @@ Digital visitor sign-in system for NIS reception.
 1. `docker compose up --build`
 2. App: `http://localhost:5173`
 3. API health: `http://localhost:3001/health`
-4. Admin login: `admin@smefinder.local` / `admin123`
+4. Admin login: `admin@nis.local` / `admin123`
 
 ## Main URLs
 - Public sign-in page: `http://localhost:5173/visitor-signin`
@@ -27,7 +27,7 @@ Digital visitor sign-in system for NIS reception.
 
 ## Email alert setup (required for real sending)
 Set these in `server/.env` or Docker environment:
-- `NOTIFY_FROM_EMAIL` (default `smefinder@nw-its.com`)
+- `NOTIFY_FROM_EMAIL` (default `signin@nw-its.com`)
 - `VISITOR_ALERT_TO` (default `rebecca.bunch@nw-its.com`)
 - `SMTP_HOST`
 - `SMTP_PORT` (usually `587`)

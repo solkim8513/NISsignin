@@ -34,11 +34,6 @@ export default function VisitorSigninPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50 px-4 py-6">
       <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
-        <img
-          src={nisLogo}
-          alt="NIS logo"
-          className="mx-auto mb-4 w-full max-w-sm h-auto"
-        />
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Visitor Sign-In</h1>
         <p className="mt-2 text-sm text-slate-600">Nationwide IT Services, Inc. - Please complete all fields.</p>
 
@@ -100,6 +95,12 @@ export default function VisitorSigninPage() {
             {isSubmitting ? 'Submitting...' : 'Sign In'}
           </button>
         </form>
+
+        <img
+          src={nisLogo}
+          alt="NIS logo"
+          className="mx-auto mt-6 block h-auto max-w-full"
+        />
       </div>
     </div>
   );

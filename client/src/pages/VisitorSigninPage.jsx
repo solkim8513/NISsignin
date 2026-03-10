@@ -223,16 +223,6 @@ export default function VisitorSigninPage() {
                   </option>
                 ))}
               </select>
-              <input
-                className="w-full rounded-md border border-slate-300 p-3 text-base"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={4}
-                placeholder="Time In (HHMM)"
-                value={form.time_in}
-                onChange={(e) => setForm({ ...form, time_in: e.target.value.replace(/\D/g, '') })}
-                required
-              />
               {form.id_type === 'other' && (
                 <label className="w-full text-sm text-slate-600 md:col-span-2">
                   Type of ID - Other
@@ -245,6 +235,16 @@ export default function VisitorSigninPage() {
                   />
                 </label>
               )}
+              <input
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={4}
+                placeholder="Time In (HHMM)"
+                value={form.time_in}
+                onChange={(e) => setForm({ ...form, time_in: e.target.value.replace(/\D/g, '') })}
+                required
+              />
               <input
                 className="w-full rounded-md border border-slate-300 p-3 text-base"
                 inputMode="numeric"

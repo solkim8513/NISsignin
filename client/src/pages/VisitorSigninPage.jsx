@@ -31,70 +31,86 @@ export default function VisitorSigninPage() {
     }
   }
 
+  function returnToForm() {
+    setSubmitted(false);
+    setError('');
+    setForm(initialForm);
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50 px-4 py-6">
       <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Visitor Sign-In</h1>
         <p className="mt-2 text-sm text-slate-600">Nationwide IT Services, Inc. - Please complete all fields.</p>
 
-        {submitted && (
-          <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-            Thank you. Your sign-in has been recorded.
+        {submitted ? (
+          <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 p-5 text-emerald-900">
+            <p className="text-base font-medium">Thank you. Your sign-in has been recorded.</p>
+            <p className="mt-2 text-sm text-emerald-800">Need to register another visitor? Select Return to form.</p>
+            <button
+              type="button"
+              onClick={returnToForm}
+              className="mt-4 rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
+            >
+              Return to form
+            </button>
           </div>
+        ) : (
+          <>
+            {error && (
+              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
+            <form className="mt-5 space-y-3" onSubmit={submit}>
+              <input
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                placeholder="Full name"
+                value={form.full_name}
+                onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                required
+              />
+              <input
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                placeholder="Company"
+                value={form.company}
+                onChange={(e) => setForm({ ...form, company: e.target.value })}
+                required
+              />
+              <input
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                type="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+              />
+              <input
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                placeholder="Phone number"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                required
+              />
+              <textarea
+                className="w-full rounded-md border border-slate-300 p-3 text-base"
+                placeholder="Purpose of visit"
+                value={form.purpose_of_visit}
+                onChange={(e) => setForm({ ...form, purpose_of_visit: e.target.value })}
+                required
+              />
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full rounded-md bg-blue-600 px-4 py-3 text-base font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+              >
+                {isSubmitting ? 'Submitting...' : 'Sign In'}
+              </button>
+            </form>
+          </>
         )}
-
-        {error && (
-          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        <form className="mt-5 space-y-3" onSubmit={submit}>
-          <input
-            className="w-full rounded-md border border-slate-300 p-3 text-base"
-            placeholder="Full name"
-            value={form.full_name}
-            onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-            required
-          />
-          <input
-            className="w-full rounded-md border border-slate-300 p-3 text-base"
-            placeholder="Company"
-            value={form.company}
-            onChange={(e) => setForm({ ...form, company: e.target.value })}
-            required
-          />
-          <input
-            className="w-full rounded-md border border-slate-300 p-3 text-base"
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            required
-          />
-          <input
-            className="w-full rounded-md border border-slate-300 p-3 text-base"
-            placeholder="Phone number"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            required
-          />
-          <textarea
-            className="w-full rounded-md border border-slate-300 p-3 text-base"
-            placeholder="Purpose of visit"
-            value={form.purpose_of_visit}
-            onChange={(e) => setForm({ ...form, purpose_of_visit: e.target.value })}
-            required
-          />
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-md bg-blue-600 px-4 py-3 text-base font-medium text-white hover:bg-blue-700 disabled:opacity-60"
-          >
-            {isSubmitting ? 'Submitting...' : 'Sign In'}
-          </button>
-        </form>
 
         <img
           src={nisLogo}

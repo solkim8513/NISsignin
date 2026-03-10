@@ -27,7 +27,7 @@ describe('Visitor sign-in routes', () => {
           full_name: 'Jane Visitor',
           company: 'NIS',
           email: 'jane@example.com',
-          phone: '555-1010',
+          phone: '5551010',
           purpose_of_visit: 'Meeting',
           visit_date: '2026-03-10',
           submitted_at: '2026-03-10T12:00:00.000Z'
@@ -39,7 +39,7 @@ describe('Visitor sign-in routes', () => {
       full_name: 'Jane Visitor',
       company: 'NIS',
       email: 'jane@example.com',
-      phone: '555-1010',
+      phone: '5551010',
       purpose_of_visit: 'Meeting'
     });
 
@@ -47,6 +47,32 @@ describe('Visitor sign-in routes', () => {
     expect(response.body.success).toBe(true);
     expect(response.body.signin.full_name).toBe('Jane Visitor');
     expect(response.body.email_notification).toBeDefined();
+  });
+
+  test('rejects invalid email format', async () => {
+    const response = await request(app).post('/api/visitor-signins/public').send({
+      full_name: 'Jane Visitor',
+      company: 'NIS',
+      email: 'invalid-email',
+      phone: '5551010',
+      purpose_of_visit: 'Meeting'
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('valid email');
+  });
+
+  test('rejects non-numeric phone', async () => {
+    const response = await request(app).post('/api/visitor-signins/public').send({
+      full_name: 'Jane Visitor',
+      company: 'NIS',
+      email: 'jane@example.com',
+      phone: '555-1010',
+      purpose_of_visit: 'Meeting'
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('numbers only');
   });
 
   test('returns QR metadata', async () => {

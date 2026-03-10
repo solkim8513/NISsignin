@@ -9,6 +9,20 @@ const initialForm = {
   phone: '',
   purpose_of_visit: ''
 };
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_DIGITS_REGEX = /^\d+$/;
+
+function getApiErrorMessage(error) {
+  const fallback = 'Unable to submit right now. Please try again.';
+  if (!error || !error.message) return fallback;
+  try {
+    const parsed = JSON.parse(error.message);
+    if (parsed && parsed.error) return parsed.error;
+  } catch {
+    return error.message || fallback;
+  }
+  return fallback;
+}
 
 export default function VisitorSigninPage() {
   const [form, setForm] = useState(initialForm);
@@ -18,14 +32,32 @@ export default function VisitorSigninPage() {
 
   async function submit(event) {
     event.preventDefault();
+    const normalizedForm = {
+      ...form,
+      full_name: form.full_name.trim(),
+      company: form.company.trim(),
+      email: form.email.trim().toLowerCase(),
+      phone: form.phone.trim(),
+      purpose_of_visit: form.purpose_of_visit.trim()
+    };
+
+    if (!EMAIL_REGEX.test(normalizedForm.email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (!PHONE_DIGITS_REGEX.test(normalizedForm.phone)) {
+      setError('Phone number must contain numbers only.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
     try {
-      await apiPost('/api/visitor-signins/public', form);
+      await apiPost('/api/visitor-signins/public', normalizedForm);
       setSubmitted(true);
       setForm(initialForm);
-    } catch {
-      setError('Unable to submit right now. Please try again.');
+    } catch (submitError) {
+      setError(getApiErrorMessage(submitError));
     } finally {
       setIsSubmitting(false);
     }
@@ -88,9 +120,12 @@ export default function VisitorSigninPage() {
               />
               <input
                 className="w-full rounded-md border border-slate-300 p-3 text-base"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder="Phone number"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
                 required
               />
               <textarea

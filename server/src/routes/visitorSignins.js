@@ -5,6 +5,13 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 const { sendVisitorSigninNotification } = require('../services/emailService');
 
 const router = express.Router();
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_DIGITS_REGEX = /^\d+$/;
+
+function normalizeText(value) {
+  if (value === null || value === undefined) return '';
+  return String(value).trim();
+}
 
 function normalizeDate(value) {
   if (!value) return null;
@@ -14,22 +21,27 @@ function normalizeDate(value) {
 
 router.post('/public', async (req, res, next) => {
   try {
-    const { full_name, company, email, phone, purpose_of_visit } = req.body;
+    const full_name = normalizeText(req.body.full_name);
+    const company = normalizeText(req.body.company);
+    const email = normalizeText(req.body.email).toLowerCase();
+    const phone = normalizeText(req.body.phone);
+    const purpose_of_visit = normalizeText(req.body.purpose_of_visit);
+
     if (!full_name || !company || !email || !phone || !purpose_of_visit) {
       return res.status(400).json({ error: 'All fields are required' });
+    }
+    if (!EMAIL_REGEX.test(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address' });
+    }
+    if (!PHONE_DIGITS_REGEX.test(phone)) {
+      return res.status(400).json({ error: 'Phone number must contain numbers only' });
     }
 
     const result = await pool.query(
       `INSERT INTO visitor_signins (full_name, company, email, phone, purpose_of_visit)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id, full_name, company, email, phone, purpose_of_visit, visit_date, submitted_at`,
-      [
-        String(full_name).trim(),
-        String(company).trim(),
-        String(email).trim().toLowerCase(),
-        String(phone).trim(),
-        String(purpose_of_visit).trim()
-      ]
+      [full_name, company, email, phone, purpose_of_visit]
     );
 
     const signin = result.rows[0];

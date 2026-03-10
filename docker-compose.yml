@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: sme_finder
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  server:
+    build:
+      context: ./server
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/sme_finder
+      JWT_SECRET: dev_jwt_secret
+      CLIENT_BASE_URL: http://localhost:5173
+      NOTIFY_FROM_EMAIL: smefinder@nw-its.com
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  client:
+    build:
+      context: ./client
+    environment:
+      VITE_API_BASE_URL: http://localhost:3001
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

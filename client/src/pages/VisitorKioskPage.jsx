@@ -1,0 +1,146 @@
+import { useEffect, useMemo, useState } from 'react';
+import { apiDelete, apiGet } from '../lib/api';
+
+function todayDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export default function VisitorKioskPage() {
+  const [date, setDate] = useState(todayDate());
+  const [records, setRecords] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [qrImage, setQrImage] = useState('');
+  const [publicUrl, setPublicUrl] = useState('');
+  const [message, setMessage] = useState('');
+
+  const role = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || '{}').role || 'viewer';
+    } catch {
+      return 'viewer';
+    }
+  }, []);
+
+  async function loadRecords(nextDate = date) {
+    const data = await apiGet(`/api/visitor-signins?date=${nextDate}`);
+    setRecords(data.records || []);
+    setTotal(data.total || 0);
+  }
+
+  async function loadQr() {
+    const url = `${window.location.origin}/visitor-signin`;
+    const qr = await apiGet(`/api/visitor-signins/qr?url=${encodeURIComponent(url)}`);
+    setPublicUrl(qr.url);
+    setQrImage(qr.image_data_url);
+  }
+
+  useEffect(() => {
+    Promise.all([loadRecords(), loadQr()]).catch(() => setMessage('Unable to load kiosk data right now.'));
+  }, []);
+
+  async function refresh() {
+    setMessage('');
+    try {
+      await loadRecords();
+      await loadQr();
+      setMessage('Kiosk data refreshed.');
+    } catch {
+      setMessage('Refresh failed.');
+    }
+  }
+
+  async function clearSelectedDate() {
+    setMessage('');
+    try {
+      const result = await apiDelete(`/api/visitor-signins/by-date?date=${date}`);
+      await loadRecords(date);
+      setMessage(`Deleted ${result.deleted} records for ${date}.`);
+    } catch {
+      setMessage('Unable to clear selected date.');
+    }
+  }
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-4xl font-semibold tracking-tight">Visitor Sign-In Kiosk</h1>
+        <p className="mt-1 text-sm text-slate-500">
+          Use the QR code for personal phones, or open the public URL on the lobby iPad browser.
+        </p>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className="rounded-xl border border-slate-200 bg-white p-4">
+          <h2 className="text-lg font-semibold">Public Sign-In Link</h2>
+          <p className="mt-2 rounded-md border border-slate-200 bg-slate-50 p-2 text-sm break-all">{publicUrl}</p>
+          <a
+            className="mt-2 inline-block text-sm text-blue-600 hover:underline"
+            href={publicUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open Sign-In Page
+          </a>
+          {qrImage && <img src={qrImage} alt="Visitor sign-in QR code" className="mt-4 h-56 w-56 rounded-md border border-slate-200 p-2" />}
+        </section>
+
+        <section className="rounded-xl border border-slate-200 bg-white p-4">
+          <h2 className="text-lg font-semibold">Daily Log</h2>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <input
+              type="date"
+              className="rounded-md border border-slate-300 p-2"
+              value={date}
+              onChange={(e) => {
+                const next = e.target.value;
+                setDate(next);
+                loadRecords(next).catch(() => setMessage('Unable to load selected date.'));
+              }}
+            />
+            <button className="rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50" onClick={refresh}>
+              Refresh
+            </button>
+            {role === 'admin' && (
+              <button className="rounded-md bg-red-600 px-3 py-2 text-sm text-white hover:bg-red-700" onClick={clearSelectedDate}>
+                Clear This Date
+              </button>
+            )}
+          </div>
+          <p className="mt-3 text-sm text-slate-600">Total sign-ins for {date}: <span className="font-semibold">{total}</span></p>
+          {message && <p className="mt-2 text-sm text-emerald-700">{message}</p>}
+        </section>
+      </div>
+
+      <section className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-slate-50 text-left text-slate-600">
+              <th className="p-3">Time</th>
+              <th className="p-3">Name</th>
+              <th className="p-3">Company</th>
+              <th className="p-3">Email</th>
+              <th className="p-3">Phone</th>
+              <th className="p-3">Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            {!records.length ? (
+              <tr><td className="p-4 text-slate-500" colSpan={6}>No sign-ins for this date.</td></tr>
+            ) : (
+              records.map((row) => (
+                <tr key={row.id} className="border-t border-slate-100">
+                  <td className="p-3">{new Date(row.submitted_at).toLocaleTimeString()}</td>
+                  <td className="p-3 font-medium">{row.full_name}</td>
+                  <td className="p-3">{row.company}</td>
+                  <td className="p-3">{row.email}</td>
+                  <td className="p-3">{row.phone}</td>
+                  <td className="p-3">{row.purpose_of_visit}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </section>
+    </div>
+  );
+}

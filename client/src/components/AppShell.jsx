@@ -30,7 +30,11 @@ export default function AppShell() {
     <div className="min-h-screen bg-slate-100 text-slate-900 md:flex">
       <aside className="w-full bg-[#0b1733] text-white md:min-h-screen md:w-64">
         <div className="border-b border-white/10 p-5">
-          <img src={nisLogo} alt="NIS logo" className="h-auto w-full rounded bg-white p-2" />
+          <img
+            src={nisLogo}
+            alt="NIS logo"
+            className="h-20 w-auto max-w-full rounded bg-white p-2 object-contain"
+          />
           <p className="mt-2 text-xs text-slate-300">Visitor Management</p>
         </div>
 

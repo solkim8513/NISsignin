@@ -24,7 +24,11 @@ export default function LoginPage() {
 
   return (
     <form className="max-w-md mx-auto bg-white p-6 rounded shadow" onSubmit={submit}>
-      <img src={nisLogo} alt="NIS logo" className="mb-4 h-auto w-full rounded border border-slate-200 p-2" />
+      <img
+        src={nisLogo}
+        alt="NIS logo"
+        className="mb-4 h-24 w-auto max-w-full rounded border border-slate-200 p-2 object-contain"
+      />
       <h1 className="text-xl font-semibold mb-4">Admin Sign In</h1>
       <input className="w-full border p-2 mb-3" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
       <input className="w-full border p-2 mb-3" value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Password" />

@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import nisLogo from '../assets/nis-logo.svg';
+import nisLogo from '../assets/nis-logo-original.png';
 
 function LinkItem({ to, children }) {
   return (
@@ -33,7 +33,7 @@ export default function AppShell() {
           <img
             src={nisLogo}
             alt="NIS logo"
-            className="w-full h-auto rounded bg-white p-2"
+            className="w-full h-auto"
           />
           <p className="mt-2 text-xs text-slate-300">Visitor Management</p>
         </div>

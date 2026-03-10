@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiPost } from '../lib/api';
-import nisLogo from '../assets/nis-logo.svg';
+import nisLogo from '../assets/nis-logo-original.png';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -27,7 +27,7 @@ export default function LoginPage() {
       <img
         src={nisLogo}
         alt="NIS logo"
-        className="mx-auto mb-4 w-full max-w-sm h-auto rounded border border-slate-200 p-2"
+        className="mx-auto mb-4 w-full max-w-sm h-auto"
       />
       <h1 className="text-xl font-semibold mb-4">Admin Sign In</h1>
       <input className="w-full border p-2 mb-3" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />

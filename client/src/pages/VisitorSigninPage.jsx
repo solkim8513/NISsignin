@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { apiPost } from '../lib/api';
-import nisLogo from '../assets/nis-logo.svg';
+import nisLogo from '../assets/nis-logo-original.png';
 
 const initialForm = {
   full_name: '',
@@ -37,7 +37,7 @@ export default function VisitorSigninPage() {
         <img
           src={nisLogo}
           alt="NIS logo"
-          className="mx-auto mb-4 w-full max-w-sm h-auto rounded border border-slate-200 p-2"
+          className="mx-auto mb-4 w-full max-w-sm h-auto"
         />
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Visitor Sign-In</h1>
         <p className="mt-2 text-sm text-slate-600">Nationwide IT Services, Inc. - Please complete all fields.</p>

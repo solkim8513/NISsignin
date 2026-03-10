@@ -33,7 +33,7 @@ Digital visitor sign-in system for NIS reception.
 - Containerized with Docker Compose
 
 ## Email alert setup (required for real sending)
-Set these in a root `.env` file next to `docker-compose.yml` or export them in your shell:
+Create `server/.env` (based on `server/.env.example`) and set:
 - `NOTIFY_FROM_EMAIL` (default `nissignin@nw-its.com`)
 - `VISITOR_ALERT_TO` (default `rebecca.bunch@nw-its.com`)
 - `SMTP_HOST`
@@ -43,3 +43,11 @@ Set these in a root `.env` file next to `docker-compose.yml` or export them in y
 - `SMTP_PASS`
 
 If SMTP is not configured, sign-in still succeeds and email is skipped safely with reason `SMTP is not configured`.
+
+## Daily auto report schedule
+- `DAILY_REPORT_ENABLED` (`true` or `false`)
+- `DAILY_REPORT_TIME` (`HH:MM`, 24-hour, default `17:00`)
+- `REPORT_TIMEZONE` (default `America/New_York`)
+- `DAILY_REPORT_CHECK_INTERVAL_MS` (default `60000`)
+
+When enabled, server sends one automatic daily PDF report to `VISITOR_ALERT_TO` after the scheduled time and logs it to `daily_report_runs`.

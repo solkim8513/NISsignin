@@ -47,6 +47,15 @@ async function bootstrapDb() {
     `CREATE INDEX IF NOT EXISTS idx_visitor_signins_visit_date
      ON visitor_signins(visit_date, submitted_at DESC)`
   );
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS daily_report_runs (
+      report_date DATE PRIMARY KEY,
+      status TEXT NOT NULL,
+      detail TEXT,
+      processed_at TIMESTAMP NOT NULL DEFAULT NOW()
+    )`
+  );
 }
 
 module.exports = { bootstrapDb };

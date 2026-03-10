@@ -18,14 +18,10 @@ services:
       PORT: 3001
       DATABASE_URL: postgresql://postgres:postgres@db:5432/nis_signin
       JWT_SECRET: dev_jwt_secret
-      CLIENT_BASE_URL: ${CLIENT_BASE_URL:-http://localhost:5173}
-      NOTIFY_FROM_EMAIL: ${NOTIFY_FROM_EMAIL:-nissignin@nw-its.com}
-      VISITOR_ALERT_TO: ${VISITOR_ALERT_TO:-rebecca.bunch@nw-its.com}
-      SMTP_HOST: ${SMTP_HOST:-}
-      SMTP_PORT: ${SMTP_PORT:-587}
-      SMTP_SECURE: ${SMTP_SECURE:-false}
-      SMTP_USER: ${SMTP_USER:-}
-      SMTP_PASS: ${SMTP_PASS:-}
+      DAILY_REPORT_ENABLED: ${DAILY_REPORT_ENABLED:-true}
+      DAILY_REPORT_TIME: ${DAILY_REPORT_TIME:-17:00}
+      REPORT_TIMEZONE: ${REPORT_TIMEZONE:-America/New_York}
+      DAILY_REPORT_CHECK_INTERVAL_MS: ${DAILY_REPORT_CHECK_INTERVAL_MS:-60000}
     ports:
       - "3001:3001"
     depends_on:

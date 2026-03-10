@@ -39,6 +39,13 @@ CREATE TABLE IF NOT EXISTS visitor_signins (
 CREATE INDEX IF NOT EXISTS idx_visitor_signins_visit_date
   ON visitor_signins(visit_date, submitted_at DESC);
 
+CREATE TABLE IF NOT EXISTS daily_report_runs (
+  report_date DATE PRIMARY KEY,
+  status TEXT NOT NULL,
+  detail TEXT,
+  processed_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 INSERT INTO users (email, password_hash, first_name, last_name, role)
 SELECT 'admin@nis.local', crypt('admin123', gen_salt('bf')), 'System', 'Admin', 'admin'::user_role
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@nis.local');

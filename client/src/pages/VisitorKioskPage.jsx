@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { apiDelete, apiGet, apiPost } from '../lib/api';
 
 function todayDate() {
-  return new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
 }
 
 function getApiErrorMessage(error, fallback) {
@@ -13,6 +15,14 @@ function getApiErrorMessage(error, fallback) {
   } catch {
     return error.message || fallback;
   }
+}
+
+function getSessionAwareError(error, fallback) {
+  const message = getApiErrorMessage(error, fallback);
+  if (/invalid token|missing token|not authenticated|forbidden/i.test(message)) {
+    return 'Your admin session expired. Please sign out and sign back in.';
+  }
+  return message;
 }
 
 export default function VisitorKioskPage() {
@@ -48,23 +58,54 @@ export default function VisitorKioskPage() {
   }
 
   useEffect(() => {
-    Promise.all([loadRecords(), loadQr()]).catch(() => {
-      setMessageTone('error');
-      setMessage('Unable to load kiosk data right now.');
-    });
+    let canceled = false;
+
+    async function init() {
+      let recordsError = '';
+      let qrError = '';
+
+      try {
+        await loadRecords();
+      } catch (error) {
+        recordsError = getSessionAwareError(error, 'Unable to load daily records right now.');
+      }
+
+      try {
+        await loadQr();
+      } catch (error) {
+        qrError = getApiErrorMessage(error, 'Unable to generate QR right now.');
+      }
+
+      if (canceled) return;
+
+      if (recordsError) {
+        setMessageTone('error');
+        setMessage(recordsError);
+        return;
+      }
+
+      if (qrError) {
+        setMessageTone('error');
+        setMessage(`Daily records loaded, but QR is unavailable: ${qrError}`);
+      }
+    }
+
+    init();
+    return () => {
+      canceled = true;
+    };
   }, []);
 
   async function refresh() {
     setMessage('');
     setMessageTone('info');
     try {
-      await loadRecords();
-      await loadQr();
+      await Promise.all([loadRecords(), loadQr()]);
       setMessageTone('success');
       setMessage('Kiosk data refreshed.');
-    } catch {
+    } catch (error) {
       setMessageTone('error');
-      setMessage('Refresh failed.');
+      setMessage(getSessionAwareError(error, 'Refresh failed.'));
     }
   }
 
@@ -140,7 +181,10 @@ export default function VisitorKioskPage() {
               onChange={(e) => {
                 const next = e.target.value;
                 setDate(next);
-                loadRecords(next).catch(() => setMessage('Unable to load selected date.'));
+                loadRecords(next).catch((error) => {
+                  setMessageTone('error');
+                  setMessage(getSessionAwareError(error, 'Unable to load selected date.'));
+                });
               }}
             />
             <button className="rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50" onClick={refresh}>
